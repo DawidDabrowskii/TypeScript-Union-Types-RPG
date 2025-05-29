@@ -2,7 +2,6 @@ import React from "react";
 import { Character, CharacterWithStats, StatusEffect } from "../types/game";
 import {
   getCharacterPrimaryStats,
-  getSpecialAttribute,
   isWarrior,
   isMage,
   isArcher,
@@ -44,21 +43,65 @@ const getCharacterColor = (character: Character): string => {
 const getStatusIcon = (effect: StatusEffect) => {
   switch (effect.type) {
     case "poisoned":
-      return <Skull className="w-4 h-4 text-green-400" title={`Poisoned: ${effect.damage} dmg for ${effect.duration} turns`} />;
+      return (
+        <div
+          title={`Poisoned: ${effect.damage} dmg for ${effect.duration} turns`}
+        >
+          <Skull className="w-4 h-4 text-green-400" />
+        </div>
+      );
     case "burning":
-      return <Zap className="w-4 h-4 text-red-400" title={`Burning: ${effect.damage} dmg for ${effect.duration} turns`} />;
+      return (
+        <div
+          title={`Burning: ${effect.damage} dmg for ${effect.duration} turns`}
+        >
+          <Zap className="w-4 h-4 text-red-400" />
+        </div>
+      );
     case "frozen":
-      return <Shield className="w-4 h-4 text-blue-400" title={`Frozen for ${effect.duration} turns`} />;
+      return (
+        <div title={`Frozen for ${effect.duration} turns`}>
+          <Shield className="w-4 h-4 text-blue-400" />
+        </div>
+      );
     case "blessed":
-      return <Heart className="w-4 h-4 text-yellow-400" title={`Blessed: +${effect.healAmount} healing for ${effect.duration} turns`} />;
+      return (
+        <div
+          title={`Blessed: +${effect.healAmount} healing for ${effect.duration} turns`}
+        >
+          <Heart className="w-4 h-4 text-yellow-400" />
+        </div>
+      );
     case "cursed":
-      return <Skull className="w-4 h-4 text-purple-400" title={`Cursed: -${effect.damageReduction} damage for ${effect.duration} turns`} />;
+      return (
+        <div
+          title={`Cursed: -${effect.damageReduction} damage for ${effect.duration} turns`}
+        >
+          <Skull className="w-4 h-4 text-purple-400" />
+        </div>
+      );
     default:
       return null;
   }
 };
 
-
+const getSpecialAttribute = (character: Character): string => {
+  if (isWarrior(character)) {
+    return `Weapon: ${character.weaponType} | Battle Cry: "${character.battleCry}"`;
+  }
+  if (isMage(character)) {
+    return `Element: ${character.element} | Spells: ${character.spells.join(
+      ", "
+    )}`;
+  }
+  if (isArcher(character)) {
+    return `Arrow Type: ${character.arrowType} | Range Bonus: +${character.rangeBonus}`;
+  }
+  if (isRogue(character)) {
+    return `Backstab: x${character.backstabMultiplier} | Poison: ${character.poisonDamage}`;
+  }
+  return "";
+};
 
 export const CharacterCard: React.FC<CharacterCardProps> = ({
   character,

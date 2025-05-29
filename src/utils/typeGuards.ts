@@ -1,151 +1,104 @@
-import {
-  Character,
-  CharacterWithStats,
-  CharacterClass,
-  Element,
-  SpellName,
-  StatusEffect,
-  BaseStats,
-  AbilityForClass,
-} from "../types/game";
+import { Character, StatusEffect, Item, Element } from "../types/game";
 
-// Type guard functions to check character types
-export const isWarrior = (
+export function isWarrior(
   character: Character
-): character is Extract<Character, { type: "warrior" }> => {
+): character is Extract<Character, { type: "warrior" }> {
   return character.type === "warrior";
-};
+}
 
-export const isMage = (
+export function isMage(
   character: Character
-): character is Extract<Character, { type: "mage" }> => {
+): character is Extract<Character, { type: "mage" }> {
   return character.type === "mage";
-};
+}
 
-export const isArcher = (
+export function isArcher(
   character: Character
-): character is Extract<Character, { type: "archer" }> => {
+): character is Extract<Character, { type: "archer" }> {
   return character.type === "archer";
-};
+}
 
-export const isRogue = (
+export function isRogue(
   character: Character
-): character is Extract<Character, { type: "rogue" }> => {
+): character is Extract<Character, { type: "rogue" }> {
   return character.type === "rogue";
-};
+}
 
-// Get primary stat based on character type
-export const getPrimaryStat = (character: Character): number => {
-  if (isWarrior(character)) return character.strength;
-  if (isMage(character)) return character.intelligence;
-  if (isArcher(character)) return character.dexterity;
-  if (isRogue(character)) return character.stealth;
-  return 0;
-};
+// Type guard for statuses
+export function isPoisoned(
+  effect: StatusEffect
+): effect is Extract<StatusEffect, { type: "poisoned" }> {
+  return effect.type === "poisoned";
+}
 
-// Get character primary stats description
-export const getCharacterPrimaryStats = (character: Character): string => {
+export function isBurning(
+  effect: StatusEffect
+): effect is Extract<StatusEffect, { type: "burning" }> {
+  return effect.type === "burning";
+}
+
+export function isFrozen(
+  effect: StatusEffect
+): effect is Extract<StatusEffect, { type: "frozen" }> {
+  return effect.type === "frozen";
+}
+
+// Type guard for items
+export function isWeapon(
+  item: Item
+): item is Extract<Item, { type: "weapon" }> {
+  return item.type === "weapon";
+}
+
+export function isArmor(item: Item): item is Extract<Item, { type: "armor" }> {
+  return item.type === "armor";
+}
+
+export function isPotion(
+  item: Item
+): item is Extract<Item, { type: "potion" }> {
+  return item.type === "potion";
+}
+
+// Utility function using type guards
+export function getCharacterPrimaryStats(character: Character): string {
   if (isWarrior(character)) {
-    return `Strength: ${character.strength} | Armor: ${character.armor}`;
+    return `Strength: ${character.strength}, Armor: ${character.armor}`;
   }
   if (isMage(character)) {
-    return `Intelligence: ${character.intelligence} | Mana: ${character.mana}`;
+    return `Intelligence: ${character.intelligence}, Mana: ${character.mana}`;
   }
   if (isArcher(character)) {
-    return `Dexterity: ${character.dexterity} | Accuracy: ${character.accuracy}`;
+    return `Dexterity: ${character.dexterity}, Accuracy: ${character.accuracy}`;
   }
   if (isRogue(character)) {
-    return `Stealth: ${character.stealth} | Critical: ${character.criticalChance}%`;
+    return `Stealth: ${character.stealth}, Crit Chance: ${character.criticalChance}%`;
   }
-  return "";
-};
 
-// Get special attributes for each character type
-export const getSpecialAttribute = (character: Character): string => {
-  if (isWarrior(character)) {
-    return `Weapon: ${character.weaponType} | Battle Cry: "${character.battleCry}"`;
-  }
-  if (isMage(character)) {
-    return `Element: ${character.element} | Spells: ${character.spells.join(
-      ", "
-    )}`;
-  }
-  if (isArcher(character)) {
-    return `Arrow Type: ${character.arrowType} | Range Bonus: +${character.rangeBonus}`;
-  }
-  if (isRogue(character)) {
-    return `Backstab: x${character.backstabMultiplier} | Poison: ${character.poisonDamage}`;
-  }
-  return "";
-};
+  // TypeScript knows that this will never happen
+  const exhaustiveCheck: never = character;
+  return exhaustiveCheck;
+}
 
-// Calculate total power for a character
-export const calculateTotalPower = (
-  character: CharacterWithStats<Character>
-): number => {
-  const primaryStat = getPrimaryStat(character);
-  const healthBonus = character.health * 0.1;
-  const levelBonus = character.level * 5;
-  const experienceBonus = character.experience * 0.05;
+// Template literal type functions
+export function createSpellName<T extends Element>(element: T): `${T}_spell` {
+  return `${element}_spell` as const;
+}
 
-  return Math.round(primaryStat + healthBonus + levelBonus + experienceBonus);
-};
+export function getSpellDescription(spell: `${Element}_spell`): string {
+  const element = spell.split("_")[0] as Element;
 
-// Add stats to character
-export const addStatsToCharacter = <T extends Character>(
-  character: T,
-  baseStats: BaseStats,
-  abilities: AbilityForClass<T["type"]>[],
-  statusEffects: StatusEffect[] = []
-): CharacterWithStats<T> => {
-  const characterWithStats = {
-    ...character,
-    ...baseStats,
-    abilities,
-    statusEffects,
-  } as CharacterWithStats<T>;
-
-  return characterWithStats;
-};
-
-// Utility function to generate spell names
-export const generateSpellName = <T extends Element>(
-  element: T
-): SpellName<T> => {
-  return `${element}_spell` as SpellName<T>;
-};
-
-// Alias for createSpellName (for compatibility)
-export const createSpellName = generateSpellName;
-
-// Status effect utility functions
-export const getDamageFromStatusEffect = (effect: StatusEffect): number => {
-  switch (effect.type) {
-    case "poisoned":
-    case "burning":
-      return effect.damage;
-    case "cursed":
-      return effect.damageReduction;
+  switch (element) {
+    case "fire":
+      return "🔥 Deals fire damage over time";
+    case "ice":
+      return "❄️ Slows and deals ice damage";
+    case "lightning":
+      return "⚡ Quick strike with chain damage";
+    case "dark":
+      return "🌑 Drains life and curses enemy";
     default:
-      return 0;
+      const exhaustiveCheck: never = element;
+      return exhaustiveCheck;
   }
-};
-
-export const getHealingFromStatusEffect = (effect: StatusEffect): number => {
-  if (effect.type === "blessed") {
-    return effect.healAmount;
-  }
-  return 0;
-};
-
-// Character class validation
-export const isValidCharacterClass = (
-  value: string
-): value is CharacterClass => {
-  return ["warrior", "mage", "archer", "rogue"].includes(value);
-};
-
-// Element validation
-export const isValidElement = (value: string): value is Element => {
-  return ["fire", "ice", "lightning", "dark"].includes(value);
-};
+}
