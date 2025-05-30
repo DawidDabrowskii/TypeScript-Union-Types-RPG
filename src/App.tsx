@@ -1,113 +1,141 @@
-import React from "react";
 import { CharacterCard } from "./components/CharacterCard";
+import { TypeShowcase } from "./components/TypeShowcase";
 import { GameActions } from "./components/GameActions";
 import { useGameState } from "./hooks/useGameState";
+import { Gamepad2, Code, Sparkles } from "lucide-react";
 
 function App() {
-  const { gameState, selectCharacter, performAction, addRandomStatusEffect, currentCharacter } = useGameState();
+  const {
+    gameState,
+    selectCharacter,
+    performAction,
+    addRandomStatusEffect,
+    currentCharacter,
+  } = useGameState();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-blue-900">
-      <div className="container mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-5xl font-bold text-white mb-4 drop-shadow-lg">
-            TypeScript Union RPG
-          </h1>
-          <p className="text-xl text-white/80 mb-2">
-            Advanced TypeScript Union Types, Template Literals & Conditional Types
-          </p>
-          <p className="text-lg text-white/60">
-            Game Phase: {gameState.gamePhase} • Current Character: {gameState.currentCharacter + 1} • Inventory: {gameState.inventory.length} items
-          </p>
-        </div>
-
-        {/* Current Character Info */}
-        <div className="mb-8 p-6 bg-white/10 backdrop-blur-sm rounded-xl border border-white/20">
-          <h2 className="text-2xl font-bold text-white mb-4">
-            Current Character: {currentCharacter.type}
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-white">
-            <div>
-              <p className="font-semibold">Level:</p>
-              <p>{currentCharacter.level}</p>
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-gray-900">
+      {/* Header */}
+      <header className="bg-black/20 backdrop-blur-sm border-b border-white/10">
+        <div className="max-w-7xl mx-auto px-4 py-6">
+          <div className="flex items-center space-x-4">
+            <div className="p-3 rounded-xl bg-gradient-to-r from-purple-600 to-blue-600">
+              <Gamepad2 className="w-8 h-8 text-white" />
             </div>
             <div>
-              <p className="font-semibold">Health:</p>
-              <p>{currentCharacter.health}</p>
-            </div>
-            <div>
-              <p className="font-semibold">Experience:</p>
-              <p>{currentCharacter.experience}/100</p>
-            </div>
-            <div>
-              <p className="font-semibold">Abilities:</p>
-              <p>{currentCharacter.abilities.length}</p>
+              <h1 className="text-3xl font-bold text-white">
+                TypeScript Union Types RPG
+              </h1>
+              <p className="text-purple-200 mt-1">
+                Advanced union types in practice
+              </p>
             </div>
           </div>
         </div>
+      </header>
 
-        {/* Characters Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          {gameState.characters.map((character, index) => (
-            <CharacterCard
-              key={`${character.type}-${index}`}
-              character={character}
-              isSelected={gameState.currentCharacter === index}
-              onSelect={() => selectCharacter(index)}
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        {/* Character Selection */}
+        <section className="mb-8">
+          <div className="flex items-center space-x-3 mb-6">
+            <Code className="w-6 h-6 text-purple-400" />
+            <h2 className="text-2xl font-bold text-white">
+              Select Your Character
+            </h2>
+            <span className="text-purple-300">(Discriminated Union Types)</span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+            {gameState.characters.map((character, index) => (
+              <CharacterCard
+                key={index}
+                character={character}
+                isSelected={gameState.currentCharacter === index}
+                onSelect={() => selectCharacter(index)}
+              />
+            ))}
+          </div>
+
+          <div className="flex justify-center">
+            <button
+              onClick={addRandomStatusEffect}
+              className="px-6 py-3 bg-gradient-to-r from-yellow-600 to-orange-600 text-white font-semibold rounded-lg hover:from-yellow-500 hover:to-orange-500 transition-all duration-200 transform hover:scale-105 flex items-center space-x-2"
+            >
+              <Sparkles className="w-5 h-5" />
+              <span>Add Random Status Effect</span>
+            </button>
+          </div>
+        </section>
+
+        {/* Game Interface */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Actions Panel */}
+          <div className="lg:col-span-1">
+            <GameActions
+              character={currentCharacter}
+              onAction={performAction}
             />
-          ))}
-        </div>
+          </div>
 
-        {/* Game Actions */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <GameActions
-            character={currentCharacter}
-            onAction={performAction}
-          />
-          
-          {/* Additional Actions */}
-          <div className="bg-gray-800 rounded-xl p-6">
-            <h3 className="text-xl font-bold text-white mb-4">Game Controls</h3>
-            <div className="space-y-3">
-              <button
-                onClick={addRandomStatusEffect}
-                className="w-full p-3 bg-purple-600 hover:bg-purple-700 rounded-lg text-white font-semibold transition-colors"
-              >
-                Add Random Status Effect
-              </button>
-              <button
-                onClick={() => selectCharacter((gameState.currentCharacter + 1) % gameState.characters.length)}
-                className="w-full p-3 bg-blue-600 hover:bg-blue-700 rounded-lg text-white font-semibold transition-colors"
-              >
-                Switch to Next Character
-              </button>
-            </div>
-            
-            {/* Inventory Display */}
-            <div className="mt-6">
-              <h4 className="text-white font-semibold mb-2">Inventory ({gameState.inventory.length} items):</h4>
-              <div className="space-y-2">
-                {gameState.inventory.map((item, index) => (
-                  <div key={index} className="text-sm text-gray-300 bg-gray-700 p-2 rounded">
-                    <span className="font-medium">{item.name}</span> ({item.type})
-                    {item.type === 'weapon' && ` - ${item.damage} damage`}
-                    {item.type === 'armor' && ` - ${item.defense} defense`}
-                    {item.type === 'potion' && ` - ${item.amount} ${item.effect}`}
-                  </div>
-                ))}
-              </div>
-            </div>
+          {/* Type Showcase */}
+          <div className="lg:col-span-2">
+            <TypeShowcase character={currentCharacter} />
           </div>
         </div>
 
-        {/* Footer */}
-        <div className="mt-12 text-center">
-          <p className="text-white/60 text-sm">
-            Click on character cards to select them and see TypeScript union
-            types in action!
-          </p>
-        </div>
+        {/* Educational Notes */}
+        <section className="mt-12 bg-gradient-to-r from-blue-900/50 to-purple-900/50 rounded-xl p-8">
+          <h3 className="text-2xl font-bold text-white mb-4">
+            What this application demonstrates
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-white/90">
+            <div>
+              <h4 className="text-lg font-semibold text-blue-300 mb-2">
+                Union Types in practice:
+              </h4>
+              <ul className="space-y-2 text-sm">
+                <li>
+                  • <strong>Discriminated Unions</strong> - different character
+                  types with common 'type' field
+                </li>
+                <li>
+                  • <strong>Type Guards</strong> - safe type checking at runtime
+                </li>
+                <li>
+                  • <strong>Type Narrowing</strong> - automatic type narrowing
+                  by TypeScript
+                </li>
+                <li>
+                  • <strong>Exhaustive Checking</strong> - ensuring all cases
+                  are handled
+                </li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="text-lg font-semibold text-purple-300 mb-2">
+                Advanced patterns:
+              </h4>
+              <ul className="space-y-2 text-sm">
+                <li>
+                  • <strong>Template Literal Types</strong> - dynamic string
+                  type generation
+                </li>
+                <li>
+                  • <strong>Conditional Types</strong> - types dependent on
+                  conditions
+                </li>
+                <li>
+                  • <strong>Mapped Types</strong> - transformation of existing
+                  types
+                </li>
+                <li>
+                  • <strong>Utility Types</strong> - Extract, Exclude, Pick,
+                  Omit
+                </li>
+              </ul>
+            </div>
+          </div>
+        </section>
       </div>
     </div>
   );
