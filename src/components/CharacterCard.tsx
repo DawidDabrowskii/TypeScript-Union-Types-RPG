@@ -111,7 +111,7 @@ export const CharacterCard: React.FC<CharacterCardProps> = ({
   const gradientClass = getCharacterColor(character);
 
   return (
-    <div
+    <button
       className={`relative p-6 rounded-xl cursor-pointer transform transition-all duration-300 hover:scale-105 ${
         isSelected
           ? "ring-4 ring-yellow-400 shadow-2xl shadow-yellow-400/25"
@@ -202,6 +202,6 @@ export const CharacterCard: React.FC<CharacterCardProps> = ({
           </span>
         ))}
       </div>
-    </div>
+    </button>
   );
 };
